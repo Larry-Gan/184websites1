@@ -1,7 +1,249 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 1 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Project 1: Rasterizer</h1>
+<h2 align="middle">Larry Gan and Willie Race</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>
+            We implemented a triangle rasterizer to draw and color an image, supersampling to increase the quality of our image,
+            barycentric coordinates to apply textures and color with greater detail, and pixel and level sampling as alternatives to supersampling.
+        </p>
+
+        <p>
+
+        </p>
+
+        <h2 align="middle">Section I: Rasterization</h2>
+
+        <h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+        <p>
+            In order to rasterize triangles we found the minimum and maximum x and y values, so we didn't need to iterate through the entire bounding box.
+            We would then iterate through bounds defined by those values. For each value, we took the middle point, offset the x and y by .5,
+            and checked if that point was within the bounds of the triangle coordinates. We checked by using formulas from class, specifically slides from lecture 2.
+            In order to deal with winding issues, we added a check for if point B was below the line from point A to point C, if it's below, we need to reverse the sign of the test.
+            This algorithm is no worse than one that checks each sample within the bounding box of the triangle because that's exactly what we're doing.
+        </p>
+
+        <div style="text-align: center;">
+            <img src="images/task1.png" align="middle" width="400px">
+            <figcaption align="middle">Rasterized triangles in <em>basic/test4.png</em></figcaption>
+        </div>
+
+        <h3 align="middle">Part 2: Antialiasing triangles</h3>
+        <p>
+            Supersampling increases the overall quality of the image. In general, a higher sampling rate gets a better approximation of the original image.
+            However, supersampling is costly beceause we are scaling up the number of computations by the sample rate.
+            Supersampling also helps to get rid of artifacts in the image. Some pixels may appear isolated, but averaging down the supersampled pixels has the effect of blurring the image.
+            To implement supersampling, we expanded the size of the sample buffer (a 2d array) in accordance with the sample rate and modified all parts of the code to account for that increased size.
+        </p>
+        <p>
+            As is plainly obvious in these comparison images, increased supersampiling results in better looking triangles.
+            Lower sampling rate images have more artifacts like incomplete triangle corners and jagged edges. These occur because 
+            the sampling rate was too slow to account for the frequency of pixel changes in the image. Supersampling fixes these issues by
+            having higher sampling speeds, which lowers the probability of alisasing as seen with lower frequencies.
+        </p>
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/task2p1.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 1</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task2p4.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 4</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/task2p16.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 16</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h4 align="middle"> Part 2 EC: Alternative Sampling Pattern</h4>
+        <p>
+            We also implemented an alternative supersampling scheme whereby we slightly perturb the sample locations called jittered sampling.
+            The idea of jittered sampling is to avoid artifacts caused by the regularity of grid-based sampling.
+            Note the interesting behavior of artifacts concentrated along the edges of the image triangles, and the 
+            fact that these artifacts decrease as sampling rate goes up.
+        </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/task2EC.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 1</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/screenshot_2-14_15-45-3.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 16</figcaption>
+                    </td>
+                </tr>
+            </table>
+            <figcaption align="middle">Jittered supersampling artifacts in <em>basic/test2.png</em></figcaption>
+        </div>
+
+        <p>
+            If we increase the supersampling rate, these edge artifacts disappear. This is an expected result.
+            Suppose an edge passes through a pixel. If we randomly sample that pixel it may land on either side of the edge and fill the pixel with the corresponding color.
+            A pixel that is not along any edge would have the same color regardless of where the sample landed.
+        </p>
+
+        <h3 align="middle">Part 3: Transforms</h3>
+
+        <div style="text-align: center;">
+            <img src="images/my_robot.png" align="middle" width="400px">
+            <figcaption align="middle">Waving robot</figcaption>
+        </div>
+
+        <p>
+            If we naively attempt to rotate the robot's arm we run into problems since the rotation transformation applies
+            rotations about the origin which is the center of the arm segment whereas we would like to rotate about the joint.
+            To solve, we first apply a translation of half the length of the arm segment to the right, rotate, then translate back.
+        </p>
+
+        <h2 align="middle">Section II: Sampling</h2>
+
+        <h3 align="middle">Part 4: Barycentric coordinates</h3>
+        <p>
+            For any point on a triangle, find the shortest distance line from each vertex of the triangle and that point.
+            These distances, normalized so that they sum to 1, are the barycentric coordinates of that point.
+            We normalize these distances so that each point in the triangle can be represented uniquely.
+            One use of the barycentric coordinate system is to create an even color gradient across the triangle by defining
+            each vertex to be a different color.
+        </p>
+
+        <div style="text-align: center;">
+            <img src="images/Barycentric_RGB.png" align="middle" width="220px">
+            <figcaption align="middle" style="margin-top: 10px;">Blending colors using barycentric coordinates</figcaption>
+        </div>
+
+        <div style="text-align: center;">
+            <img src="images/task4.png" align="middle" width="400px">
+        </div>
+
+        <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+        <p>
+            Pixel sampling takes place within a texture map. The texture, from which we get our color, is already defined along a grid.
+            Sometimes, we must sample a point that is between the pixel values contained in the grid.
+            To do this, we estimate the color value of that point either through nearest pixel sampling or bilinear interpolation.
+            For nearest pixel sampling, we simply set the color value of our sample to equal the color value of the closest texture coordinate.
+            To implement bilinear interpolation, we find the nearest four texture coordinates by taking the floor and ceiling of the sample coordinates
+            and then assign the sample the weighted average of the nearest four color values according to their distances from the sample.
+        </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/task5p1near.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 1 and psm=nearest</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task5p1linear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 1 and psm=linear</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/task5p16near.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 16 and psm=nearest</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task5p16linear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Supersample rate 16 and psm=linear</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            When the supersample rate is 1, the parrot's stripes are noticably smoother with linear pixel interpolation.
+            However, the differences between nearest pixel sampling and linear pixel interpolation are imperceptable when the supersample rate is 16.
+            We do see that, when the supersample rate is 1, linear pixel interpolation approximates the image quality of a supersample rate of 16 better than nearest.
+            This happens because linear takes into account the values of nearby pixels too while nearest only takes the nearest, so linear perserves more information from the original image.
+        </p>
+        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+        <p>
+            Mipmaps are a sequence of textures where each subsequent texture is downsampled from the previous.
+            We use mipmaps to preserve detail when objects are close to the camera and save time rendering objects that are far away.
+            Setting the mipmap level to zero would sample from the highest resolution level.
+        </p>
+
+        <p>
+            We might want to estimate the value of a point that is in between two levels.
+            One way to do this would be to have that point assume the value of the nearest level.
+            That would be nearest level sampling. We could also perform bilinear interpolation where we set the point's value to the weighted average of the nearest levels.
+        </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/task6zeronear.png" align="middle" width="400px" />
+                        <figcaption align="middle">lsm=0 and psm=nearest</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6zerolinear.png" align="middle" width="400px" />
+                        <figcaption align="middle">lsm=0 and psm=linear</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/task6nearnear.png" align="middle" width="400px" />
+                        <figcaption align="middle">lsm=nearest and psm=nearest</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6nearlinear.png" align="middle" width="400px" />
+                        <figcaption align="middle">lsm=nearest and psm=linear</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            Supersampling gives us high quality images but at a high cost. The purpose of pixel and level sampling is to give us comparable image quality but without the computational cost.
+            For pixel sampling, instead of packing more samples into one pixel and averaging down we just average from the nearest samples. 
+            For level sampling, we preserve computation by achieving high resolution only when needed (for objects that are closer).
+            Pixel and level sampling are similar in terms of runtime, but level sampling requires more memory from use of the mipmap in order to have more antialiasing power.
+            supersampling takes more memory and time, but comes out with the best anti-aliasing power.
+        </p>
+
+
+    </div></body>
 </html>
