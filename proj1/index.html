@@ -194,7 +194,8 @@
             When the supersample rate is 1, the parrot's stripes are noticably smoother with linear pixel interpolation.
             However, the differences between nearest pixel sampling and linear pixel interpolation are imperceptable when the supersample rate is 16.
             We do see that, when the supersample rate is 1, linear pixel interpolation approximates the image quality of a supersample rate of 16 better than nearest.
-            This happens because linear takes into account the values of nearby pixels too while nearest only takes the nearest, so linear perserves more information from the original image.
+            This happens because linear takes into account the values of nearby pixels too while nearest only takes the nearest, 
+            so linear perserves more information from the original image.
         </p>
         <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
 
@@ -240,8 +241,9 @@
             Supersampling gives us high quality images but at a high cost. The purpose of pixel and level sampling is to give us comparable image quality but without the computational cost.
             For pixel sampling, instead of packing more samples into one pixel and averaging down we just average from the nearest samples. 
             For level sampling, we preserve computation by achieving high resolution only when needed (for objects that are closer).
-            Pixel and level sampling are similar in terms of runtime, but level sampling requires more memory from use of the mipmap in order to have more antialiasing power.
-            supersampling takes more memory and time, but comes out with the best anti-aliasing power.
+            While level sampling is more efficient that pixel sampling, accuracy is lost because sometimes we are sampling from already downsampled versions of the texture.
+            Level and pixel sampling generally take similar amounts of time to run, althought linear level seems to take slightly longer according to our clocks.
+            Supersampling takes more memory and time, but comes out with the best anti-aliasing power.
         </p>
 
 
