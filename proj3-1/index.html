@@ -41,10 +41,10 @@
 
 <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
 <h1 align="middle">Project 3-1: Path Tracer</h1>
-<h2 align="middle">YOUR NAME(S)</h2>
+<h2 align="middle">Larry Gan, Willie Race</h2>
 
 <!-- Add Website URL -->
-<h2 align="middle">Website URL: <a href="TODO">TODO</a></h2>
+<h2 align="middle">Website URL: <a href="https://larry-gan.github.io/184websites1/proj3-1/index.html">https://larry-gan.github.io/184websites1/proj3-1/index.html</a></h2>
 
 <br><br>
 
@@ -60,7 +60,7 @@
 </div>
 
 <p>All of the text in your write-up should be <em>in your own words</em>. If you need to add additional HTML features to this document, you can search the <a href="http://www.w3schools.com/">http://www.w3schools.com/</a> website for instructions. To edit the HTML, you can just copy and paste existing chunks and fill in the text and image file names appropriately.</p>
-<o>The website writeup is intended to be a self-contained walkthrough of the assignment: we want this to be a piece of work which showcases your understanding of relevant concepts through both mesh images as well as written explanations about what you did to complete each part of the assignment. Try to be as clear and organized as possible when writing about your own output files or extensions to the assignment. We want to understand what you've achieved and how you've done it!</p> 
+<o>The website writeup is intended to be a self-contained walkthrough of the assignment: we want this to be a piece of work which showcases your understanding of relevant concepts through both mesh images as well as written explanations about what you did to complete each part of the assignment. Try to be as clear and organized as possible when writing about your own output files or extensions to the assignment. We want to understand what you've achieved and how you've done it!</p>
 <p>If you are well-versed in web development, feel free to ditch this template and make a better looking page.</p>
 
 
@@ -200,8 +200,8 @@ Do <em>NOT</em> use absolute paths, such as <pre>"/Users/student/Desktop/image.j
         The BVH acceleration was really successful at speeding things up.
         When measured on the cow dae, no acceleration took around 80 seconds to render (my computer is really bad) and 0.0005 seconds to build bvh from 5856 primitives.
         With acceleration on, it took 0.1227 seconds to render and 0.0146 seconds to build the BVH.
-        From these results, it looks like the building took a bit longer than an order of magnitude to build (which didn't matter much anyways due to short build times), 
-        but several orders of magnitude less to render. 
+        From these results, it looks like the building took a bit longer than an order of magnitude to build (which didn't matter much anyways due to short build times),
+        but several orders of magnitude less to render.
         This makes sense because instead of iterating through all primitives once and being done, we have to iterate through them multiple times to build out a tree structure, increasing the runtime.
         This gets flipped when rendering because the tree structure allows us to avoid checking many useless primitives as we can now terminate early if a ray doesn't intersect with a bounding box.
     </p>
@@ -440,8 +440,8 @@ Do <em>NOT</em> use absolute paths, such as <pre>"/Users/student/Desktop/image.j
     </div>
     <br />
     <p>
-        As our sampling rate goes up, the amount of noise starts to decrease by quite a bit. 
-        Unfortunately, even high values of samples per pixel still have a bit of noise, but it's very very small. 
+        As our sampling rate goes up, the amount of noise starts to decrease by quite a bit.
+        Unfortunately, even high values of samples per pixel still have a bit of noise, but it's very very small.
     </p>
     <br />
 
