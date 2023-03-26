@@ -1,7 +1,184 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Your Name  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3-2: Additional Features to PathTracer</h1>
+    <h2 align="middle">Larry Gan, Willie Race</h2>
+    <h2 align="middle"> <a href="https://larry-gan.github.io/184websites1/proj3-2/index.html">https://larry-gan.github.io/184websites1/proj3-2/index.html</a></h2>
+
+    <div class="padded">
+
+
+        * NOTE: For this project, you will choose TWO out of the four given parts to complete. One of those parts must be Part 1 or Part 2. In other words, you can choose any combination of two parts except the pair (Part 3, Part 4).
+
+        <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p>
+            <b>
+                Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
+            </b>
+        </p>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/p2/CBdragon_microfacet_005.png" align="middle" width="400px" />
+                        <figcaption>0.005</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p2/CBdragon_microfacet_05.png" align="middle" width="400px" />
+                        <figcaption>0.05</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/p2/CBdragon_microfacet_25.png" align="middle" width="400px" />
+                        <figcaption>0.25</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p2/CBdragon_microfacet_5.png" align="middle" width="400px" />
+                        <figcaption>0.5</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <p>
+            When the alpha value is very small, the surface of the dragon is glossy and highly reflective. This also results in the gold specks that are scattered throughout the image. As we increase the alpha value, the surface of the dragon becomes more diffuse. This simulates are more rough surface on the object.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
+            </b>
+        </p>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/p2/CBbunny_microfacet_hemisphere.png" align="middle" width="400px" />
+                        <figcaption>Hemisphere Sampling (default)</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p2/CBbunny_microfacet_importance.png" align="middle" width="400px" />
+                        <figcaption>Importance Sampling</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <p>
+            Similar to the difference between hemisphere sampling and importance sampling for direct lighting in Project 3-1, cosine hemisphere sampling will converge to the correct image for the bunny, but it takes much more samples and a substantially longer time to do so. Since we fix the sample rate per pixel to be 64, cosine hemisphere sampling has not yet had time to converge properly so it looks bad and contains lots of artifacts. For importance sampling, a sample rate of 64 is sufficient for a nice image.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to.
+            </b>
+        </p>
+        <div align="middle">
+                <td>
+                    <img src="images/p2/CBdragon_microfacet_fe.png" align="middle" width="400px" />
+                    <figcaption>Iron Dragon</figcaption>
+                </td>
+        </div>
+        
+        <p>
+            Here we use the indices of refraction for iron which makes the surface of the material look kind of like a mix between gold and silver. We thought an alpha value of 0.25 was appropriate since iron in the real world looks more diffuse.
+        </p>
+        <br />
+
+        <h3 align="middle">Part 4. Depth of Field</h3>
+        <b>
+            For these subparts, we recommend using a microfacet BSDF scene to show off the cool out of focus effects you can get with depth of field!
+        </b>
+        <p>
+            <b>
+                In a few sentences, explain the differences between a pinhole camera model and a thin-lens camera model.
+            </b>
+        </p>
+        <p>
+            With a pinhole camera, we simply cast a ray from the center of the camera into the scene. For a thin lens camera, we also cast a ray from the center of the scene but this ray defines our focal point. We then randomly sample rays through our lens that pivot around the focal point into the scene. Since all the rays intersect with the focal point, the image will be focused around that point but blurred at other depths according to the aperature. If the aperature is higher, the blurring effect will be greater since the length of the lens will be greater which increases the variation we get from the random sampling. If the aperature is zero, that is effectively a pinhole camera so the entire scene will be in focus.
+        </p>
+        <br />
+        <p>
+            <b>
+                Show a "focus stack" where you focus at 4 visibly different depths through a scene. Make sure to include all screenshots.
+            </b>
+        </p>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/p4/dragon_depth3.png" align="middle" width="400px" />
+                        <figcaption>depth = 3</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p4/dragon_depth4.5.png" align="middle" width="400px" />
+                        <figcaption>depth = 4.5</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/p4/dragon_depth5.png" align="middle" width="400px" />
+                        <figcaption>depth = 5</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p4/dragon_depth6.png" align="middle" width="400px" />
+                        <figcaption>depth = 6</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <p>
+            <b>
+                Show a sequence of 4 pictures with visibly different aperture sizes, all focused at the same point in a scene. Make sure to include all screenshots.
+            </b>
+        </p>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/p4/dragon_aperature0.png" align="middle" width="400px" />
+                        <figcaption>aperture = 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p4/dragon_aperature0.1.png" align="middle" width="400px" />
+                        <figcaption>aperture = 0.1</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/p4/dragon_aperature0.3.png" align="middle" width="400px" />
+                        <figcaption>aperture = 0.3</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/p4/dragon_aperature0.5.png" align="middle" width="400px" />
+                        <figcaption>aperture = 0.5</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+    </div>
+</body>
 </html>
+
