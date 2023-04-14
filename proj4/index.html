@@ -26,7 +26,7 @@
     <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
     <h1 align="middle">Project 4: Cloth Simulator</h1>
     <h2 align="middle">Larry Gan, Willie Race</h2>
-    <h2 align="middle">https://larry-gan.github.io/184websites1/proj4/index.html</h2>
+    <h2 align="middle"><a href="https://larry-gan.github.io/184websites1/proj4/index.html">https://larry-gan.github.io/184websites1/proj4/index.html</a></h2>
 
     <br /><br />
 
@@ -37,12 +37,12 @@
         <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
     </b>
     <p>
-        In this project, we implemented a simulation of a cloth using a mass and spring based system. 
-        Afer being able to create a cloth with multipl point masses and springs connecting each point mass, 
-        we applied all the forces acting on each point mass, 
+        In this project, we implemented a simulation of a cloth using a mass and spring based system.
+        Afer being able to create a cloth with multipl point masses and springs connecting each point mass,
+        we applied all the forces acting on each point mass,
         used numerical integration to compute the location of each point mass positions, and adjusted
-        the positions to prevent too much stretching. 
-        We then handled collisions with spheres and planes by bumping the cloth back if they collide with the plane/sphere, 
+        the positions to prevent too much stretching.
+        We then handled collisions with spheres and planes by bumping the cloth back if they collide with the plane/sphere,
         and collisions with itself by hashing the position of every point mass into a spatial hash map (to accelerate computation)
         and adjusting positions after self collision on the fly.
         Lastly, we created shaders to add textures to the meshes.
